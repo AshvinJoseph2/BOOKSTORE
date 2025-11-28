@@ -35,10 +35,10 @@ function App() {
       <Route path='/books/:id/view' element={<View/>}/>
 
       <Route path='/admin/home' element={<AdminHome/>}/>
-      <Route path='/admin/collection' element={<AdminCollection/>}/>      
+      <Route path='/admin/collections' element={<AdminCollection/>}/>      
       <Route path='/admin/profile' element={<AdminProfile/>}/>
 
-      <Route path='/' element={<Pnf/>}/>
+      <Route path='/*' element={<Pnf/>}/>
 
     </Routes>
     </>
