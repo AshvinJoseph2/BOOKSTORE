@@ -120,7 +120,7 @@ function AdminHome() {
           <div className="md:grid grid-cols-2 px-5">
             <div >
               {/* Bar chart  */}
-              <ResponsiveContainer width={'450'} height={'300'}>
+              <ResponsiveContainer width={'100%'} height={'300'}>
                 <BarChart data={data}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
@@ -134,7 +134,7 @@ function AdminHome() {
             </div>
             <div>
               {/* Pie chart */}
-              <ResponsiveContainer width={'450'} height={'300'}>
+              <ResponsiveContainer width={'100%'} height={'300'}>
                 <PieChart>
                   <Pie
                     data={data01}

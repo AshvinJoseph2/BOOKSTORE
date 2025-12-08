@@ -2,9 +2,8 @@ import React from 'react'
 import Header from '../components/Header'
 import Footer from '../../components/Footer'
 import { IoLocationSharp } from "react-icons/io5";
-import { FaPhoneAlt } from "react-icons/fa";
+import { FaPaperPlane, FaPhoneAlt } from "react-icons/fa";
 import { IoIosMailOpen } from "react-icons/io";
-import { IoIosSend } from "react-icons/io";
 import Iframe from 'react-iframe';
 
 function Contact() {
@@ -41,7 +40,7 @@ function Contact() {
               <input type="text" className='p-2 ps-5 bg-white w-full rounded mb-2'placeholder='Name'/>
               <input type="text" className='p-2 ps-5  bg-white w-full rounded mb-2'placeholder='Email ID'/>
               <textarea type="text" className='p-2 ps-5  bg-white w-full h-25 rounded mb-2'placeholder='message'/>
-              <button className='w-full bg-blue-950 rounded text-white pt-2 pb-2'>Send<IoIosSend style={{marginTop:"-20px",marginLeft:"232px"}} className='text-white text-md'/> </button>
+              <button className='w-full bg-blue-950 rounded flex text-white pt-2 pb-2 justify-center'>Send<FaPaperPlane   className='text-white ms-2 '/> </button>
             </div>
             <div className='p-5 rounded m-5'>
               <Iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d62865.55832720463!2d76.30948095113635!3d10.008813464705796!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080c8e94a07a07%3A0x49921cdfae82660!2sKakkanad%2C%20Kerala!5e0!3m2!1sen!2sin!4v1764229592344!5m2!1sen!2sin" width='100%' height='100%' style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></Iframe>
