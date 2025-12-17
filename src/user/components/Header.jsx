@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FaBars, FaInstagram, FaUser } from "react-icons/fa";
+import { FaAddressCard, FaBars, FaInstagram, FaPowerOff, FaUser } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
@@ -8,6 +8,18 @@ import { FaXTwitter } from "react-icons/fa6";
 function Header() {
 
 const [toggle,setToggle] = useState(false)
+const [token,setToken] = useState("")
+const [dp,setDp] = useState("")
+const [dropdown,setDropdown] = useState(false)
+
+useEffect(()=>{
+  if(sessionStorage.getItem("token") && sessionStorage.getItem("user")){
+    const userToken = sessionStorage.getItem("token")
+    setToken(userToken)
+    const user = JSON.parse(sessionStorage.getItem("user"))
+    setDp(user.picture)
+  }
+},[token])
 
   return (
     <>
@@ -26,7 +38,26 @@ const [toggle,setToggle] = useState(false)
           <FaInstagram className='me-1'/>
           <FaXTwitter className='me-1'/>
           <FaFacebookF/>
-          <Link to={'/login'} className='border border-black rounded px-3 py-2 ms-3 flex items-center hover:bg-black hover:text-white'><FaUser className='me-1'/>Login</Link>
+          {/* login link */}
+          {
+           !token ? 
+            <Link to={'/login'} className='border border-black rounded px-3 py-2 ms-3 flex items-center hover:bg-black hover:text-white'><FaUser className='me-1'/>Login</Link>
+            :
+            <div>
+              <button onClick={()=>setDropdown(!dropdown)} className='shadow-sm rounded ms-5 p-2 hover-bg-gray-100'>
+                <img width={'40px'}  height={'40px'} style={{borderRadius:"50%"}} src={dp?dp:"https://png.pngtree.com/png-clipart/20250105/original/pngtree-user-profile-login-icon-in-silver-color-access-authentication-vector-png-image_19841391.png"} alt="" />
+              </button>
+              {/* dropdown menu */}
+               {
+               dropdown &&
+               <div className='absolute right-0 z-0  mt-2 w-40 shadow rounded bg-white p-2 ring-1 ring-black/5 focus:outline-hidden'>
+              {/* profile link */}
+              <Link to={'/user/profile'} className='flex items-center text-gray-700 text-sm px-3 py-2'><FaAddressCard className='me-2'/>Profile</Link>
+              {/* logout btn */}
+              <button  className='flex items-center text-gray-700 text-sm px-3 py-2'><FaPowerOff className='me-2'/>Logout</button>
+              </div>}
+            </div>
+            }
         </div>
       </div>
       <nav className='w-full p-3 bg-black text-white md:flex items-center justify-center'>
@@ -34,6 +65,27 @@ const [toggle,setToggle] = useState(false)
         <div className='flex justify-between items-center text-2xl md:hidden'>
           <button onClick={()=>setToggle(!toggle)}><FaBars/></button>
           <Link to={'/login'} className='border border-black rounded px-3 py-2 ms-3 flex items-center'><FaUser className='me-1'/>Login</Link>
+          {/* login link */}
+                    {
+           !token ? 
+            <Link to={'/login'} className='border border-black rounded px-3 py-2 ms-3 flex items-center hover:bg-black hover:text-white'><FaUser className='me-1'/>Login</Link>
+            :
+            <div>
+              <button onClick={()=>setDropdown(!dropdown)} className='shadow-sm rounded ms-5 p-2 hover-bg-gray-100'>
+                <img width={'40px'}  height={'40px'} style={{borderRadius:"50%"}} src={dp?dp:"https://png.pngtree.com/png-clipart/20250105/original/pngtree-user-profile-login-icon-in-silver-color-access-authentication-vector-png-image_19841391.png"} alt="" />
+              </button>
+              {/* dropdown menu */}
+               {
+               dropdown &&
+               <div className='absolute right-0 z-0  mt-2 w-40 shadow rounded bg-white p-2 ring-1 ring-black/5 focus:outline-hidden'>
+              {/* profile link */}
+              <Link to={'/user/profile'} className='flex items-center text-gray-700 text-sm px-3 py-2'><FaAddressCard className='me-2'/>Profile</Link>
+              {/* logout btn */}
+              <button  className='flex items-center text-gray-700 text-sm px-3 py-2'><FaPowerOff className='me-2'/>Logout</button>
+              </div>}
+            </div>
+            }
+
         </div>
         <ul className= {toggle?'flex flex-col':'md:flex  items-center justify-center hidden'}>
           <li className='md:mx-4 mt-2 md:mt-0'><Link to={'/'}>HOME</Link></li>
