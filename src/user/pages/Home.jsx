@@ -1,14 +1,31 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../../components/Footer'
 import { FaSearch } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
+import { getHomePageBooksAPI } from '../../services/allAPI'
+import { searchContext } from '../../contextAPI/ShareContext'
 
 
 function Home() {
   const navigate = useNavigate()
-const [searchKey,setSearchKey] = useState("")
+// const [searchKey,setSearchKey] = useState("")
+const {searchKey,setSearchKey} = useContext(searchContext)
+const [homeBooks,setHomeBooks] = useState([])
+
+useEffect(()=>{
+  getHomeBooks()
+},[])
+
+const getHomeBooks = async ()=>{
+  const result = await getHomePageBooksAPI()
+  if(result.status==200){
+    setHomeBooks(result.data)
+  }else{
+    console.log(result);
+  }
+}
 
 const handleSearch =()=>{
   if(!searchKey){
@@ -45,41 +62,21 @@ const handleSearch =()=>{
       <h1 className='text-4xl my-2'>Explore Our Latest Collection</h1>
       <div className='md:grid grid-cols-4 w-full my-10'>
         {/* duplicate book card */}
-        <div className='shadow rounded p-3 m-4 md:my-0'>
-            <img width={'100%'} height={'300px'} src="https://cdn.kobo.com/book-images/5967e7fb-edc8-403b-9989-f8aab7b3ed89/1200/1200/False/the-alchemist-38.jpg" alt="book" />
+        {
+          homeBooks?.length>0?
+          homeBooks?.map(books=>(
+             <div key={books?._id} className='shadow rounded p-3 m-4 md:my-0'>
+            <img width={'100%'} height={'300px'} src={books?.imageURL} alt="book" />
             <div className='flex flex-col justify-center items-center mt-4'>
-              <h3 className='text-blue-700 font-bold text-xl'>Author</h3>
-              <p>title</p>
-              <p>$ 34</p>
+              <h3 className='text-blue-700 font-bold text-xl'>{books?.author}</h3>
+              <p>{books?.title}</p>
+              <p>$ {books?.discountPrice}</p>
             </div>
-        </div>
-        {/* duplicate book card */}
-        <div className='shadow rounded p-3 m-4 md:my-0'>
-            <img width={'100%'} height={'300px'} src="https://cdn.kobo.com/book-images/5967e7fb-edc8-403b-9989-f8aab7b3ed89/1200/1200/False/the-alchemist-38.jpg" alt="book" />
-            <div className='flex flex-col justify-center items-center mt-4'>
-              <h3 className='text-blue-700 font-bold text-xl'>Author</h3>
-              <p>title</p>
-              <p>$ 34</p>
-            </div>
-        </div>
-        {/* duplicate book card */}
-        <div className='shadow rounded p-3 m-4 md:my-0'>
-            <img width={'100%'} height={'300px'} src="https://cdn.kobo.com/book-images/5967e7fb-edc8-403b-9989-f8aab7b3ed89/1200/1200/False/the-alchemist-38.jpg" alt="book" />
-            <div className='flex flex-col justify-center items-center mt-4'>
-              <h3 className='text-blue-700 font-bold text-xl'>Author</h3>
-              <p>title</p>
-              <p>$ 34</p>
-            </div>
-        </div>
-        {/* duplicate book card */}
-        <div className='shadow rounded p-3 m-4 md:my-0'>
-            <img width={'100%'} height={'300px'} src="https://cdn.kobo.com/book-images/5967e7fb-edc8-403b-9989-f8aab7b3ed89/1200/1200/False/the-alchemist-38.jpg" alt="book" />
-            <div className='flex flex-col justify-center items-center mt-4'>
-              <h3 className='text-blue-700 font-bold text-xl'>Author</h3>
-              <p>title</p>
-              <p>$ 34</p>
-            </div>
-        </div>
+             </div>
+          ))
+          :
+          <p className='font-bold'>Loading...</p>
+        }
       </div>
         <div className='text-center my-10'>
           <Link to={'/books'} className='bg-black p-3 text-white font-black'>Explore More</Link>

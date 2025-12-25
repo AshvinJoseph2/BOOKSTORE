@@ -1,12 +1,87 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaPen } from 'react-icons/fa'
 import { FaX } from 'react-icons/fa6'
+import serverURl from '../../services/serverURL'
+import { toast, ToastContainer } from 'react-toastify'
+import { editUserAPI } from '../../services/allAPI'
+import { useNavigate } from 'react-router-dom'
 
 
 function Edit() {
 
+  const [offcanvasStatus,setOffcanvasStatus] = useState(false)
+  const [userDetails,setUserDetails] = useState({
+    username:"",password:"",cpassword:"",picture:"",role:"",bio:"",id:""
+  })
+  const [existingUserImage,setExistingUserImage] = useState("")
+  const [preview,setPreview] = useState("")
+  const [pswdMatch,setPswdMatch] = useState(true)
+  const navigate = useNavigate()
 
-    const [offcanvasStatus,setOffcanvasStatus] = useState(false)
+  console.log(userDetails);
+  
+  useEffect(()=>{
+    if(sessionStorage.getItem("user")){
+        const user = JSON.parse(sessionStorage.getItem("user"))
+        setUserDetails({...userDetails,username:user.username,role:user.role,bio:user.bio,id:user._id})
+        setExistingUserImage(user.picture)
+    }
+  },[])
+
+  const handlePictureUpdate = (e)=>{
+    setUserDetails({...userDetails,picture:e.target.files[0]})
+    const url = URL.createObjectURL(e.target.files[0])
+    setPreview(url)
+  }
+
+  const handleResetForm = ()=>{
+    const user = JSON.parse(sessionStorage.getItem("user"))
+    setUserDetails({username:user.username,role:user.role,bio:user.bio,password:"",cpassword:""})
+    setExistingUserImage(user.picture)
+    setPreview("")
+  }
+
+  const checkPasswordMatch = (data)=>{
+    setUserDetails({...userDetails,cpassword:data})
+    userDetails.password == data ? setPswdMatch(true) : setPswdMatch(false)
+  }
+
+  const handleUpdateUser = async()=>{
+    const {username,password,cpassword,bio,id,picture} = userDetails
+    if(!username || !password || !cpassword || !bio ){
+        toast.info("Please fill the form completely")
+    }else if(pswdMatch){
+        // api call
+        const token = sessionStorage.getItem("token")
+        if(token){
+            const reqHeader = {
+                "Authorization":`Bearer ${token}`
+            }
+            const reqBody = new FormData()
+            for(let key in userDetails){
+                if(key != "picture"){
+                    reqBody.append(key,userDetails[key])
+                }else{
+                    preview ? reqBody.append("picture",picture) : reqBody.append("picture",existingUserImage)
+                }
+            }
+            // api call 
+            const result = await editUserAPI(id,reqBody,reqHeader)
+            if(result.status==200){
+                toast.success("Profile updated successfully...")
+                setTimeout(()=>{
+                    sessionStorage.clear()
+                    navigate('/login')
+                },2000);
+            }else{
+                console.log(result);
+                toast.error("Something went wrong!!!")
+            }
+        }
+    }else{
+        toast.warning("Operation failed!!!")
+    }
+  }
 
   return (
     <div>
@@ -25,32 +100,48 @@ function Edit() {
                 {/* body */}
                 <div className="flex justify-center items-center flex-col my-5">
                     <label htmlFor="userProfile">
-                        <input type="file"  id='userProfile' hidden/>
-                        <img className='z-52' style={{width:"150px",height:"150px",borderRadius:"50%"}} src="https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg" alt="profile" />
+                        <input onChange={e=>handlePictureUpdate(e)} type="file"  id='userProfile' hidden/>
+                        {
+                            existingUserImage==""?
+                             <img className='z-52' style={{width:"150px",height:"150px",borderRadius:"50%"}} src={preview?preview:"https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png"} alt="profile" />
+                            :
+                             existingUserImage.startsWith("https://lh3.googleusercontent.com/")?
+                            <img className='z-52' style={{width:"150px",height:"150px",borderRadius:"50%"}} src={preview?preview:existingUserImage} alt="profile" />
+                            :
+                            <img className='z-52' style={{width:"150px",height:"150px",borderRadius:"50%"}} src={preview?preview:`${serverURl}/uploads/${existingUserImage}`} alt="profile" />
+
+                        }
                         <button className='bg-blue-400 z-53 fixed text-white py-2 px-3 rounded' style={{marginLeft:"75px",marginTop:"-20px"}}><FaPen/></button>
                     </label>
                     <div className='mt-10 mb-3 w-full px-5'>
-                        <input type="text" placeholder='Username' className='w-full rounded border border-gray-300 p-2' />
+                        <input value={userDetails.username} onChange={e=>setUserDetails({...userDetails,username:e.target.value})} type="text" placeholder='Username' className='w-full rounded border border-gray-300 p-2' />
                     </div>
                     <div className='mb-3 w-full px-5'>
-                        <input type="text" placeholder='New Password' className='w-full rounded border border-gray-300 p-2' />
+                        <input value={userDetails.password} onChange={e=>setUserDetails({...userDetails,password:e.target.value})}  type="password" placeholder='New Password' className='w-full rounded border border-gray-300 p-2' />
                     </div>
                     <div className='mb-3 w-full px-5'>
-                        <input type="text" placeholder='Conform Password' className='w-full rounded border border-gray-300 p-2' />
+                        <input value={userDetails.cpassword} onChange={e=>checkPasswordMatch(e.target.value)}  type="password" placeholder='Conform Password' className='w-full rounded border border-gray-300 p-2' />
                     </div>
+                    {!pswdMatch &&
+                    <div className="mb-3 w-full px-5 text-red-500 font-bold">Conform password must be match with new password</div>
+                    }
                     <div className='mb-3 w-full px-5'>
-                        <textarea type="text" placeholder='Bio' className='w-full rounded border border-gray-300 p-2' />
+                        <textarea value={userDetails.bio} onChange={e=>setUserDetails({...userDetails,bio:e.target.value})}  type="text" placeholder='Bio' className='w-full rounded border border-gray-300 p-2' />
                     </div>
                     <div className='flex w-full justify-end px-5 mt-5'>
-                        <button className='bg-yellow-600 text-white px-3 py-2 rounded'>RESET</button>
-                        <button className='bg-green-600 ms-5 text-white px-3 py-2 rounded'>UPDATE</button>
+                        <button onClick={handleResetForm} className='bg-yellow-600 text-white px-3 py-2 rounded'>RESET</button>
+                        <button onClick={handleUpdateUser} className='bg-green-600 ms-5 text-white px-3 py-2 rounded'>UPDATE</button>
                     </div>
                 </div>
             </div>
         </div>
         }
     </div>
+
   )
 }
 
+      <ToastContainer position='top-center' autoClose={3000} theme='colored'/>
+
 export default Edit
+// https://lh3.googleusercontent.com/

@@ -1,20 +1,53 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../../components/Footer'
 import { FaBars } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
+import { getAllBooksPageAPI } from '../../services/allAPI'
+import { searchContext } from '../../contextAPI/ShareContext'
 
 function Books() {
-
+const{searchKey,setSearchKey} = useContext(searchContext)
 const [toggle,setToggle] = useState(false)
 const [token,setToken] = useState("")
+const [allBooks,setAllBooks] = useState([])
+const [categories,setCategories] = useState([])
+const [tempAllBooks,setTempAllBooks] = useState([])
+console.log(categories);
+
 
 useEffect(()=>{
   if(sessionStorage.getItem("token")){
     const userToken = sessionStorage.getItem("token")
     setToken(userToken)
+    getAllBooks(userToken)
   }
-},[])
+},[searchKey])
+
+  const getAllBooks = async (token)=>{
+    const reqHeader ={
+      "Authorization":`Bearer ${token}`
+    }
+    const result = await getAllBooksPageAPI(reqHeader,searchKey)
+    if(result.status==200){
+      setAllBooks(result.data)
+      setTempAllBooks(result.data)
+      // call fn to get categories
+      const tempCategory = result.data?.map(item=>item.category)
+      setCategories([...new Set(tempCategory)]);
+      
+    }else{
+      console.log(result);
+    }
+  }
+
+  const filterBooks = (category)=>{
+   if(category!='No-filter'){
+    setAllBooks(tempAllBooks?.filter(item=>item.category==category))
+  }else{
+    setAllBooks(tempAllBooks)
+  }
+}
 
   return (
     <>
@@ -25,7 +58,7 @@ useEffect(()=>{
     <div className='flex flex-col justify-center items-center my-5'>
       <h1 className='text-3xl font-bold my-5'>Collections</h1>
       <div className='flex my-5'>
-        <input placeholder='Search By Books Title' type="text" className='p-2 border border-gray-200 text-black w-100 placeholder-gray-600'/>
+        <input value={searchKey} onChange={e=>setSearchKey(e.target.value)} placeholder='Search By Books Title' type="text" className='p-2 border border-gray-200 text-black w-100 placeholder-gray-600'/>
         <button className='p-2 bg-blue-900 text-white'>Search</button>
       </div>
     </div>
@@ -40,12 +73,16 @@ useEffect(()=>{
       {/* list of filter */}
        <div className={toggle?"block":"md:block hidden"}>
         {/* duplicate fiter items */}
+        {
+          categories?.map((item,index)=>(
+          <div key={index} className="mt-3">
+              <input onClick={()=>filterBooks(item)} type="radio" id={item} name='filter'/>
+              <label className='ms-3' htmlFor={item} >{item}</label>
+           </div>
+          ))
+        }
         <div className="mt-3">
-          <input type="radio" id="key1" name='filter'/>
-          <label className='ms-3' htmlFor="key1" >category-name</label>
-        </div>
-        <div className="mt-3">
-          <input type="radio" id="nofilter" name='filter'/>
+          <input onClick={()=>filterBooks("No-filter")} type="radio" id="nofilter" name='filter'/>
           <label className='ms-3' htmlFor="nofilter" >No-filter</label>
         </div>
        </div>
@@ -54,41 +91,21 @@ useEffect(()=>{
       <div className='col-span-3'>
         <div className='md:grid grid-cols-4 mt-5 md:mt-0'>
             {/* duplicate book */}
-            <div className='shadow rounded p-3 m-4 md:my-0'>
-            <img width={'100%'} height={'300px'} src="https://cdn.kobo.com/book-images/5967e7fb-edc8-403b-9989-f8aab7b3ed89/1200/1200/False/the-alchemist-38.jpg" alt="book" />
+            {
+              allBooks?.length>0?
+              allBooks?.map(books=>(
+                <div key={books?._id} className='shadow rounded p-3 m-4 md:mb-2' hidden={books?.status=="pending" || books?.status=="sold"}>
+            <img width={'100%'} height={'300px'} src={books?.imageURL} alt="book" />
               <div className='flex flex-col justify-center items-center mt-4'>
-              <h3 className='text-blue-700 font-bold text-xl'>Author</h3>
-              <p>title</p>
-              <Link to={'/books/:id/view'} className='bg-blue-800 p-2 text-white mt-2'>View Book</Link>
+              <h3 className='text-blue-700 font-bold text-xl'>{books?.author}</h3>
+              <p>{books?.title.slice(0,9)}...</p>
+              <Link to={`/books/${books?._id}/view`} className='bg-blue-800 p-2 text-white mt-2'>View Book</Link>
               </div>
             </div>
-             {/* duplicate book */}
-            <div className='shadow rounded p-3 m-4 md:my-0'>
-            <img width={'100%'} height={'300px'} src="https://cdn.kobo.com/book-images/5967e7fb-edc8-403b-9989-f8aab7b3ed89/1200/1200/False/the-alchemist-38.jpg" alt="book" />
-              <div className='flex flex-col justify-center items-center mt-4'>
-              <h3 className='text-blue-700 font-bold text-xl'>Author</h3>
-              <p>title</p>
-              <Link to={'/books/:id/view'} className='bg-blue-800 p-2 text-white mt-2'>View Book</Link>
-              </div>
-            </div>
-             {/* duplicate book */}
-            <div className='shadow rounded p-3 m-4 md:my-0'>
-            <img width={'100%'} height={'300px'} src="https://cdn.kobo.com/book-images/5967e7fb-edc8-403b-9989-f8aab7b3ed89/1200/1200/False/the-alchemist-38.jpg" alt="book" />
-              <div className='flex flex-col justify-center items-center mt-4'>
-              <h3 className='text-blue-700 font-bold text-xl'>Author</h3>
-              <p>title</p>
-              <Link to={'/books/:id/view'} className='bg-blue-800 p-2 text-white mt-2'>View Book</Link>
-              </div>
-            </div> 
-            {/* duplicate book */}
-            <div className='shadow rounded p-3 m-4 md:my-0'>
-            <img width={'100%'} height={'300px'} src="https://cdn.kobo.com/book-images/5967e7fb-edc8-403b-9989-f8aab7b3ed89/1200/1200/False/the-alchemist-38.jpg" alt="book" />
-              <div className='flex flex-col justify-center items-center mt-4'>
-              <h3 className='text-blue-700 font-bold text-xl'>Author</h3>
-              <p>title</p>
-              <Link to={'/books/:id/view'} className='bg-blue-800 p-2 text-white mt-2'>View Book</Link>
-              </div>
-            </div>
+              ))
+              :
+              <div className="text-center my-5 font-bold">Book Not Found...</div>
+            }
         </div>
       </div>
     </div>
@@ -104,4 +121,4 @@ useEffect(()=>{
   )
 }
 
-export default Books
+export default Books                 

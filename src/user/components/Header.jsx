@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { FaAddressCard, FaBars, FaInstagram, FaPowerOff, FaUser } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import serverURl from '../../services/serverURL';
 
 
 function Header() {
 
+const navigate = useNavigate()
 const [toggle,setToggle] = useState(false)
 const [token,setToken] = useState("")
 const [dp,setDp] = useState("")
 const [dropdown,setDropdown] = useState(false)
+
 
 useEffect(()=>{
   if(sessionStorage.getItem("token") && sessionStorage.getItem("user")){
@@ -20,6 +23,14 @@ useEffect(()=>{
     setDp(user.picture)
   }
 },[token])
+
+const logout = ()=>{
+  sessionStorage.clear()
+  setToken("")
+  setDp("")
+  setDropdown(false)
+  navigate('/')
+}
 
   return (
     <>
@@ -45,7 +56,7 @@ useEffect(()=>{
             :
             <div>
               <button onClick={()=>setDropdown(!dropdown)} className='shadow-sm rounded ms-5 p-2 hover-bg-gray-100'>
-                <img width={'40px'}  height={'40px'} style={{borderRadius:"50%"}} src={dp?dp:"https://png.pngtree.com/png-clipart/20250105/original/pngtree-user-profile-login-icon-in-silver-color-access-authentication-vector-png-image_19841391.png"} alt="" />
+                <img width={'40px'}  height={'40px'} style={{borderRadius:"50%"}} src={dp==""?"https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png":dp.startsWith("https://lh3.googleusercontent.com/")?dp:`${serverURl}/uploads/${dp}`} alt="" />
               </button>
               {/* dropdown menu */}
                {
@@ -54,7 +65,7 @@ useEffect(()=>{
               {/* profile link */}
               <Link to={'/user/profile'} className='flex items-center text-gray-700 text-sm px-3 py-2'><FaAddressCard className='me-2'/>Profile</Link>
               {/* logout btn */}
-              <button  className='flex items-center text-gray-700 text-sm px-3 py-2'><FaPowerOff className='me-2'/>Logout</button>
+              <button onClick={logout} className='flex items-center text-gray-700 text-sm px-3 py-2'><FaPowerOff className='me-2'/>Logout</button>
               </div>}
             </div>
             }
@@ -72,7 +83,7 @@ useEffect(()=>{
             :
             <div>
               <button onClick={()=>setDropdown(!dropdown)} className='shadow-sm rounded ms-5 p-2 hover-bg-gray-100'>
-                <img width={'40px'}  height={'40px'} style={{borderRadius:"50%"}} src={dp?dp:"https://png.pngtree.com/png-clipart/20250105/original/pngtree-user-profile-login-icon-in-silver-color-access-authentication-vector-png-image_19841391.png"} alt="" />
+                <img width={'40px'}  height={'40px'} style={{borderRadius:"50%"}} src={dp==""?"https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png":dp.startsWith("https://lh3.googleusercontent.com/")?dp:`${serverURl}/uploads/${dp}`} alt="" />
               </button>
               {/* dropdown menu */}
                {
@@ -81,7 +92,7 @@ useEffect(()=>{
               {/* profile link */}
               <Link to={'/user/profile'} className='flex items-center text-gray-700 text-sm px-3 py-2'><FaAddressCard className='me-2'/>Profile</Link>
               {/* logout btn */}
-              <button  className='flex items-center text-gray-700 text-sm px-3 py-2'><FaPowerOff className='me-2'/>Logout</button>
+              <button onClick={logout}  className='flex items-center text-gray-700 text-sm px-3 py-2'><FaPowerOff className='me-2'/>Logout</button>
               </div>}
             </div>
             }

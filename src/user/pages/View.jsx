@@ -1,12 +1,36 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../../components/Footer'
 import { FaBackward, FaCamera, FaEye } from 'react-icons/fa'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import { viewBookAPI } from '../../services/allAPI'
+import serverURl from '../../services/serverURL'
 
 
 function View() {
   const [modalStatus,setModalStatus] = useState(false)
+  const [book,setBook] = useState({})
+  const {id} = useParams()
+  console.log(book);
+
+  useEffect(()=>{
+    getBookDetails()
+  },[])
+
+  const getBookDetails = async()=>{
+    const token = sessionStorage.getItem('token')
+    if(token){
+       const reqHeader = {
+          "Authorization":`Bearer ${token}`
+        }
+       const result = await viewBookAPI(id,reqHeader)
+       if(result.status==200){
+        setBook(result.data)
+       }else{
+        console.log(result);
+       }
+      }
+  }
   return (
     <> 
     <Header/>
@@ -14,29 +38,29 @@ function View() {
       <div className='border p-5 shadow border-gray-200'>
         <div className='md:grid grid-cols-4 gap-x-10'>
           <div className='col-span-1'>
-            <img className='w-full' src="https://cdn.kobo.com/book-images/5967e7fb-edc8-403b-9989-f8aab7b3ed89/1200/1200/False/the-alchemist-38.jpg" alt="book" />
+            <img className='w-full' src={book?.imageURL} alt="book" />
           </div>
           <div className='col-span-3'>
             <div className='flex justify-between mt-5 md:mt-0'>
-              <h1 className='text-2xl font-bold'>title</h1>
+              <h1 className='text-2xl font-bold'>{book?.title} </h1>
               <button onClick={()=>setModalStatus(!modalStatus)} className='text-gray-400'><FaEye/></button>
             </div>
-            <h3 className='text-xl my-5 text-blue-600'>Author</h3>
+            <h3 className='text-xl my-5 text-blue-600'>{book?.author} </h3>
             <div className='md:grid grid-cols-3 gap-5 my-10'>
-              <p className='font-bold'>Publisher  :</p>
-              <p className='font-bold'>Language  :</p>
-              <p className='font-bold'>No. of pages :</p>
-              <p className='font-bold'>Category :</p>
-              <p className='font-bold'>ISBN :</p>
-              <p className='font-bold'>Original Price :</p>
-              <p className='font-bold'>Seller :</p>
+              <p className='font-bold'>Publisher  : {book?.publisher} </p>
+              <p className='font-bold'>Language  : {book?.language} </p>
+              <p className='font-bold'>No. of pages : {book?.pages} </p>
+              <p className='font-bold'>Category : {book?.category}</p>
+              <p className='font-bold'>ISBN : {book?.isbn} </p>
+              <p className='font-bold'>Original Price : {book?.price} </p>
+              <p className='font-bold'>Seller : {book?.sellerMail} </p>
             </div>
             <div className='md:my-10 my-4'>
-              <p className='font-bold text-lg'>Abstract</p>
+              <p className='font-bold text-lg'>{book?.abstract} </p>
             </div>
             <div className='flex justify-end'>
               <Link to={'/books'} className='bg-blue-900 text-white p-2 rounded flex items-center'><FaBackward className='me-2'/>Back</Link>
-              <button className='text-white p-2 rounded bg-green-900 ms-5'>Buy $ 998</button>
+              <button className='text-white p-2 rounded bg-green-900 ms-5'>Buy $ {book?.discountPrice}</button>
             </div>
           </div>
         </div>
@@ -57,9 +81,14 @@ function View() {
               <p className='text-blue-600 items-center'><FaCamera className='me-2'/>Camera click of the book in the hand of seller</p>
               {/* books in row & col */}
               <div className='md:flex flex-wrap my-4'>
-                <img className='md:w-75 w-25 md:me-2 mb-3 md:mt-0' src="https://cdn.kobo.com/book-images/5967e7fb-edc8-403b-9989-f8aab7b3ed89/1200/1200/False/the-alchemist-38.jpg" alt="book" />
-                <img className='md:w-75 w-25 md:me-2 mb-3 md:mt-0' src="https://cdn.kobo.com/book-images/5967e7fb-edc8-403b-9989-f8aab7b3ed89/1200/1200/False/the-alchemist-38.jpg" alt="book" />
-                <img className='md:w-75 w-25 md:me-2 mb-3 md:mt-0' src="https://cdn.kobo.com/book-images/5967e7fb-edc8-403b-9989-f8aab7b3ed89/1200/1200/False/the-alchemist-38.jpg" alt="book" />
+                {
+                  book?.uploadImg?.length>0 ?
+                  book?.uploadImg?.map((filename,index)=>(
+                    <img key={index} className='md:w-75 w-25 md:me-2 mb-3 md:mt-0' src={`${serverURl}/uploads/${filename}`} alt="book" />
+                  ))
+                  :
+                  <p className='font-bold text-lg'>No Book images are available...</p>
+                }
               </div>
             </div>
           </div>

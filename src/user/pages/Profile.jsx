@@ -6,6 +6,7 @@ import Edit from '../components/Edit'
 import SellBook from '../components/SellBook'
 import BookStatus from '../components/BookStatus'
 import Purchase from '../components/Purchase'
+import serverURl from '../../services/serverURL'
 
 
 function Profile() {
@@ -27,7 +28,7 @@ function Profile() {
     <Header/>
     <div style={{height:"200px"}} className='bg-black'></div>
     <div style={{width:'230px',height:'230px',borderRadius:"50%",marginLeft:"70px",marginTop:"-130px"}} className='bg-white p-3'>
-      <img width={'200px'} height={'200px'} style={{borderRadius:"50%"}} src={dp?dp:"https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg"} alt="profile" />
+      <img width={'200px'} height={'200px'} style={{borderRadius:"50%"}} src={dp==""?"https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png":dp.startsWith("https://lh3.googleusercontent.com/")?dp:`${serverURl}/uploads/${dp}`} alt="profile" />
     </div>
     <div className='md:flex justify-between px-20 mt-5'>
       <div className='flex items-center'>
