@@ -3,9 +3,9 @@ import Header from '../components/Header'
 import Footer from '../../components/Footer'
 import { FaBackward, FaCamera, FaEye } from 'react-icons/fa'
 import { Link, useParams } from 'react-router-dom'
-import { viewBookAPI } from '../../services/allAPI'
+import { bookPaymentAPI, viewBookAPI } from '../../services/allAPI'
 import serverURl from '../../services/serverURL'
-
+import {loadStripe} from '@stripe/stripe-js';
 
 function View() {
   const [modalStatus,setModalStatus] = useState(false)
@@ -29,6 +29,22 @@ function View() {
        }else{
         console.log(result);
        }
+      }
+  }
+
+  const makePayment = async()=>{
+  const stripe = await loadStripe('pk_test_51SjyzsFHpy5pNoUMZRPe79syfSWSP4hliHWeH6BuZyr0pwB1vXn0DekKmUiFfZTV7YN7ABFiJLk4iswPvEoFEzTa003smBmp7g');
+    console.log(stripe);
+    // api call
+     const token = sessionStorage.getItem('token')
+    if(token){
+       const reqHeader = {
+          "Authorization":`Bearer ${token}`
+        }
+        const result = await bookPaymentAPI(id,reqHeader)
+        console.log(result.data);
+        const {checkOutURL} = result.data
+        window.location.href = checkOutURL
       }
   }
   return (
@@ -60,7 +76,7 @@ function View() {
             </div>
             <div className='flex justify-end'>
               <Link to={'/books'} className='bg-blue-900 text-white p-2 rounded flex items-center'><FaBackward className='me-2'/>Back</Link>
-              <button className='text-white p-2 rounded bg-green-900 ms-5'>Buy $ {book?.discountPrice}</button>
+              <button onClick={makePayment} className='text-white p-2 rounded bg-green-900 ms-5'>Buy $ {book?.discountPrice}</button>
             </div>
           </div>
         </div>

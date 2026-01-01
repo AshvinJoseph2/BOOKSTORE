@@ -1,18 +1,31 @@
-import React from 'react'
+import React,{ useEffect,useState } from 'react'
 import { FaDatabase } from 'react-icons/fa'
 import { FaChartSimple, FaGear } from 'react-icons/fa6'
 import { Link } from 'react-router-dom'
-
+import serverURl from '../../services/serverURL'
 
 function AdminSidebar() {
+    const [username,setUsername] = useState("")
+    const [dp,setDp] = useState("")
+  
+    useEffect(()=>{
+      if(sessionStorage.getItem("token")&&sessionStorage.getItem("user")){
+        const user = JSON.parse(sessionStorage.getItem("user"))
+        setUsername(user?.username)
+        setDp(user?.picture)
+      }
+    },[])
+
+    
+  
   return (
     <div className='bg-blue-200 md:min-h-screen h-fit py-10'>
       {/* image */}
       <div className="flex justify-center">
-        <img style={{borderRadius:"50%",width:"100px",height:"100px"}} src="https://img.freepik.com/premium-photo/happy-man-ai-generated-portrait-user-profile_1119669-1.jpg" alt="profile" />
+      <img width={'100px'} height={'100px'} style={{borderRadius:"50%"}} src={dp==""?"https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png":dp.startsWith("https://lh3.googleusercontent.com/")?dp:`${serverURl}/uploads/${dp}`} alt="profile" />
       </div>
       {/* name */}
-      <h1 className='text-xl font-bold my-5 text-center'>Name</h1>
+      <h1 className='text-xl font-bold my-5 text-center'>{username}</h1>
       {/* nav link */}
       <div className="mt-10 flex flex-col justify-center items-center">
         <div className="mt-3">
@@ -26,6 +39,7 @@ function AdminSidebar() {
         </div>
       </div>
     </div>
+    
   )
 }
 

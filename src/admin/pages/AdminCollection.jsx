@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import AdminHeader from '../components/AdminHeader'
 import Footer from '../../components/Footer'
 import AdminSidebar from '../components/AdminSidebar'
-import { getAllAdminBooksAPI, getAllUsersAPI } from '../../services/allAPI'
+import { getAllAdminBooksAPI, getAllUsersAPI, updateBookStatusAPI } from '../../services/allAPI'
 import serverURl from '../../services/serverURL'
+import { toast, ToastContainer } from 'react-toastify'
 
 
 
@@ -11,7 +12,7 @@ function AdminCollection() {
   const [tab, setTab] = useState(1)
   const [allBooks,setAllBooks] = useState([])
   const [allUsers,setAllUsers] = useState([])
-  console.log(allUsers);
+  console.log(allBooks);
   
   useEffect(()=>{
     const token = sessionStorage.getItem("token")
@@ -48,6 +49,21 @@ function AdminCollection() {
     }
   }
 
+  const updateBookStatus = async(bookId)=>{
+    const token = sessionStorage.getItem("token")
+    if(token){
+      const reqHeader = {
+        "Authorization":`Bearer ${token}`
+      }
+      const result = await updateBookStatusAPI(bookId,reqHeader)
+      if(result.status==200){
+      toast.success("Book Approved!!!")
+      getAllBooks(token)
+    }else{
+      console.log(result);
+    }
+    }
+  }
   
   return (
     <>
@@ -75,7 +91,12 @@ function AdminCollection() {
                   <h3 className='text-blue-700 font-bold text-xl'>{book?.author}</h3>
                   <p>{book?.title}</p>
                   <p>$ {book?.discountPrice}</p>
-                  <button className='bg-green-600 rounded text-white p-2 mt-2 w-full'>Approve</button>
+                  {
+                    book?.status!="approved"?
+                    <button onClick={()=>updateBookStatus(book?._id)} className='bg-green-600 rounded text-white p-2 mt-2 w-full'>Approve</button>
+                  :
+                  <img className='mt-2' width={'50px'} src="https://static.vecteezy.com/system/resources/previews/010/152/436/original/tick-check-mark-icon-sign-symbol-design-free-png.png" alt="approved" />
+                  }
                 </div>
               </div>
                 ))
@@ -116,6 +137,7 @@ function AdminCollection() {
           }
 
         </div>
+        <ToastContainer position='top-center' autoClose={3000} theme='colored'/>
       </div>
       <Footer />
     </>

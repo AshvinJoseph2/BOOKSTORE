@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaAddressCard, FaBars, FaInstagram, FaPowerOff, FaUser } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import serverURl from '../../services/serverURL';
+import { routeGuardContext } from '../../contextAPI/AuthContext';
 
 
 function Header() {
 
+const {role,authorisedUser,setAuthorisedUser} = useContext(routeGuardContext)
 const navigate = useNavigate()
 const [toggle,setToggle] = useState(false)
 const [token,setToken] = useState("")
@@ -26,6 +28,7 @@ useEffect(()=>{
 
 const logout = ()=>{
   sessionStorage.clear()
+  setAuthorisedUser(false)
   setToken("")
   setDp("")
   setDropdown(false)

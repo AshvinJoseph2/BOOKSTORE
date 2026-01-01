@@ -62,3 +62,18 @@ export const getAllUsersAPI = async (reqHeader)=>{
     return await commonAPI("GET",`${serverURl}/users/all`,{},reqHeader)
 }
 
+// /books/:id/update :PUT request by Admin collection when approved btn clicked
+export const updateBookStatusAPI = async (id,reqHeader)=>{
+    return await commonAPI("PUT",`${serverURl}/books/${id}/update`,{},reqHeader)
+}
+
+// /books/:id DELETE request by BookStatus when delete btn clicked
+export const removeBookAPI = async (id,reqHeader)=>{
+    return await commonAPI("DELETE",`${serverURl}/books/${id}`,{},reqHeader)
+}
+
+// /books/:id/buy :PUT  request by View when buy btn clicked
+export const bookPaymentAPI = async (id,reqHeader)=>{
+    return await commonAPI("PUT",`${serverURl}/books/${id}/buy`,{},reqHeader)
+}
+
